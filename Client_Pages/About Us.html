@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Phishing Detector - About Us</title>
+    <link rel="stylesheet" href="style.css">
+    <script>
+        if (localStorage.getItem('theme') === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+        }
+    </script>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="logo-area">
+            <h2>🛡️ PhishGuard AI</h2>
+            <ul class="nav-links">
+                <li><a href="index.html">🔗 Link Scanner</a></li>
+                <li><a href="email.html">📧 Phishing Email</a></li>
+                <li><a href="sms.html">💬 Phishing SMS</a></li>
+                <li><a href="history.html">📊 History</a></li>
+                <li><a href="settings.html">⚙️ Settings</a></li>
+            </ul>
+        </div>
+        <ul class="sidebar-bottom">
+            <li class="active"><a href="about.html">ℹ️ About Us</a></li>
+            <li><a href="rating.html">⭐ Rate Us</a></li>
+            <li><a href="account.html">👤 Account / Setup</a></li>
+        </ul>
+    </aside>
+
+    <main class="main-content">
+        <div class="header">
+            <h1>About PhishGuard AI</h1>
+            <p>Learn more about our mission, vision, and the technology securing your digital life.</p>
+        </div>
+
+        <div class="scanner-container" style="margin-bottom: 20px;">
+            <h3 style="color: var(--accent-color); margin-bottom: 10px;">🎯 Our Mission</h3>
+            <p style="line-height: 1.6; color: var(--text-color);">
+                At PhishGuard AI, our goal is to provide a robust, AI-driven defense mechanism against modern cyber threats. We aim to empower individuals and organizations by instantly identifying malicious links, spear-phishing emails, and dangerous SMS texts (Smishing) before they can cause harm.
+            </p>
+        </div>
+
+        <div class="scanner-container" style="margin-bottom: 20px;">
+            <h3 style="color: var(--accent-color); margin-bottom: 10px;">⚙️ How It Works</h3>
+            <p style="line-height: 1.6; color: var(--text-color); margin-bottom: 15px;">
+                Our web application utilizes advanced JavaScript-based string validation and pattern recognition to simulate an AI security scanner. The system instantly analyzes your input against known threat vectors:
+            </p>
+            <ul style="list-style-position: inside; color: var(--text-color); line-height: 1.6; margin-left: 10px;">
+                <li><strong>URL Analysis:</strong> Detects deceptive domains and risky redirects.</li>
+                <li><strong>Content Parsing:</strong> Highlights urgency language and financial prompts.</li>
+                <li><strong>Local Storage Sync:</strong> Securely maintains your scan history and user preferences completely on the client-side.</li>
+            </ul>
+        </div>
+
+        <div class="scanner-container">
+            <h3 style="color: var(--accent-color); margin-bottom: 10px;">👨‍💻 Project Details</h3>
+            <div class="history-item safe" style="cursor: default; margin-top: 15px;">
+                <div>
+                    <span style="font-size: 0.8rem; color: var(--safe-color); font-weight: bold; display: block; margin-bottom: 4px;">DEVELOPMENT TEAM</span>
+                    <span class="link-text" style="font-size: 1rem;">Web Technology (WT) Project Submission</span>
+                </div>
+                <div class="timestamp">Version 1.0</div>
+            </div>
+            <p style="line-height: 1.6; color: var(--text-muted); font-size: 0.9rem; margin-top: 15px; text-align: center;">
+                Built with HTML5, CSS3, and JavaScript. <br> No external libraries or complex backend dependencies required.
+            </p>
+        </div>
+
+    </main>
+
+</body>
+</html>

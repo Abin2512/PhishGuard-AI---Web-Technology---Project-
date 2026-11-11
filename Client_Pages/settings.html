@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Phishing Link Detector - Settings</title>
+    <link rel="stylesheet" href="style.css">
+    <script>
+        if (localStorage.getItem('theme') === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+        }
+    </script>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="logo-area">
+            <h2>🛡️ PhishGuard AI</h2>
+            <ul class="nav-links">
+                <li><a href="index.html">🔗 Link Scanner</a></li>
+                <li><a href="email.html">📧 Phishing Email</a></li>
+                <li><a href="sms.html">💬 Phishing SMS</a></li>
+                <li><a href="history.html">📊 History</a></li>
+                <li class="active"><a href="settings.html">⚙️ Settings</a></li>
+            </ul>
+        </div>
+        <ul class="sidebar-bottom">
+            <li><a href="About Us.html">ℹ️ About Us</a></li>
+            <li><a href="rating.html">⭐ Rate Us</a></li>
+            <li><a href="account.html">👤 Account / Setup</a></li>
+        </ul>
+    </aside>
+
+    <main class="main-content">
+        <div class="header">
+            <h1>Application Settings</h1>
+            <p>Customize appearance using radio options.</p>
+        </div>
+
+        <div class="form-card">
+            <div class="setting-option" style="flex-direction: column; align-items: flex-start; gap: 12px;">
+                <div>
+                    <h4>Appearance Theme</h4>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">Choose your preferred UI display.</p>
+                </div>
+                <div class="radio-group">
+                    <label class="radio-label">
+                        <input type="radio" name="themeRadio" value="dark" id="radioDark" onclick="setTheme('dark')"> Dark Mode
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="themeRadio" value="light" id="radioLight" onclick="setTheme('light')"> Light Mode
+                    </label>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        window.onload = function() {
+            const currentTheme = localStorage.getItem('theme') || 'dark';
+            if (currentTheme === 'light') document.getElementById('radioLight').checked = true;
+            else document.getElementById('radioDark').checked = true;
+        }
+
+        function setTheme(mode) {
+            const html = document.documentElement;
+            if (mode === 'light') {
+                html.setAttribute('data-theme', 'light');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.removeAttribute('data-theme');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+    </script>
+</body>
+</html>

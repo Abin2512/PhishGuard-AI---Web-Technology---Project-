@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Phishing Detector - Combined History</title>
+    <link rel="stylesheet" href="style.css">
+    <script>
+        if (localStorage.getItem('theme') === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+        }
+    </script>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="logo-area">
+            <h2>🛡️ PhishGuard AI</h2>
+            <ul class="nav-links">
+                <li><a href="index.html">🔗 Link Scanner</a></li>
+                <li><a href="email.html">📧 Phishing Email</a></li>
+                <li><a href="sms.html">💬 Phishing SMS</a></li>
+                <li class="active"><a href="history.html">📊 History</a></li>
+                <li><a href="settings.html">⚙️ Settings</a></li>
+            </ul>
+        </div>
+        <ul class="sidebar-bottom">
+            <li><a href="About Us.html">ℹ️ About Us</a></li>
+            <li><a href="rating.html">⭐ Rate Us</a></li>
+            <li><a href="account.html">👤 Account / Setup</a></li>
+        </ul>
+    </aside>
+
+    <main class="main-content">
+        <div class="header" style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1>Activity History</h1>
+                <p>Overall scan records or filtered category logs.</p>
+            </div>
+            <button onclick="clearHistory()" style="padding: 8px 15px; background: var(--danger-color); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Clear History</button>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+            <button class="filter-btn active" id="btn-all" onclick="filterHistory('all')">All History</button>
+            <button class="filter-btn" id="btn-link" onclick="filterHistory('link')">Links Only</button>
+            <button class="filter-btn" id="btn-email" onclick="filterHistory('email')">Emails Only</button>
+            <button class="filter-btn" id="btn-sms" onclick="filterHistory('sms')">SMS Only</button>
+        </div>
+
+        <div class="history-list" id="historyContainer"></div>
+    </main>
+
+    <script>
+        let currentFilter = 'all';
+
+        function filterHistory(type) {
+            currentFilter = type;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`btn-${type}`).classList.add('active');
+            loadHistory();
+        }
+
+        function loadHistory() {
+            const container = document.getElementById('historyContainer');
+            let history = JSON.parse(localStorage.getItem('scanHistory')) || [];
+
+            // Apply filtering logic
+            if (currentFilter !== 'all') {
+                history = history.filter(item => (item.type || 'link') === currentFilter);
+            }
+
+            if (history.length === 0) {
+                container.innerHTML = `<p style="color: var(--text-muted);">No logs found for this category.</p>`;
+                return;
+            }
+
+            container.innerHTML = '';
+            history.forEach(item => {
+                const itemType = item.type || 'link';
+                const div = document.createElement('div');
+                div.className = `history-item ${item.status}`;
+                div.onclick = () => {
+                    if(itemType === 'email') window.location.href = `email.html?scan=${encodeURIComponent(item.content)}`;
+                    else if(itemType === 'sms') window.location.href = `sms.html?scan=${encodeURIComponent(item.content)}`;
+                    else window.location.href = `index.html?scan=${encodeURIComponent(item.content)}`;
+                };
+                
+                let displayContent = item.content;
+                if(displayContent.length > 80) displayContent = displayContent.substring(0, 80) + '...';
+
+                div.innerHTML = `
+                    <div>
+                        <span style="font-size: 0.8rem; color: var(--${item.status === 'safe' ? 'safe-color' : 'danger-color'}); font-weight: bold; display: block; margin-bottom: 4px;">[${itemType.toUpperCase()}] ${item.statusText}</span>
+                        <span class="link-text">${displayContent}</span>
+                    </div>
+                    <div class="timestamp">${item.dateStr} • ${item.timeStr}</div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function clearHistory() {
+            if(confirm("Are you sure you want to clear history logs?")) {
+                localStorage.removeItem('scanHistory');
+                loadHistory();
+            }
+        }
+
+        window.onload = loadHistory;
+    </script>
+</body>
+</html>

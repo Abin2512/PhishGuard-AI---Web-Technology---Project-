@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Phishing SMS Detector</title>
+    <link rel="stylesheet" href="style.css">
+    <script>
+        if (localStorage.getItem('theme') === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+        }
+    </script>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="logo-area">
+            <h2>🛡️ PhishGuard AI</h2>
+            <ul class="nav-links">
+                <li><a href="index.html">🔗 Link Scanner</a></li>
+                <li><a href="email.html">📧 Phishing Email</a></li>
+                <li class="active"><a href="sms.html">💬 Phishing SMS</a></li>
+                <li><a href="history.html">📊 History</a></li>
+                <li><a href="settings.html">⚙️ Settings</a></li>
+            </ul>
+        </div>
+        <ul class="sidebar-bottom">
+            <li><a href="About Us.html">ℹ️ About Us</a></li>
+            <li><a href="rating.html">⭐ Rate Us</a></li>
+            <li><a href="account.html">👤 Account / Setup</a></li>
+        </ul>
+    </aside>
+
+    <main class="main-content">
+        <div class="header">
+            <h1>SMS / Text Message Scanner</h1>
+            <p>Paste text message payload below to analyze for smishing attacks.</p>
+        </div>
+
+        <div class="scanner-container">
+            <div class="input-group" style="flex-direction: column;">
+                <textarea id="smsInput" placeholder="Paste incoming SMS text message here..."></textarea>
+                <button onclick="scanSms()" style="align-self: flex-end; margin-top: 10px;">Examine SMS</button>
+            </div>
+
+            <div id="resultBox" class="result-box">
+                <h4 id="resultTitle" style="margin-bottom: 5px;">Analysis Result</h4>
+                <p id="resultDesc">Details will appear here...</p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function executeSmsScan(smsContent) {
+            document.getElementById('smsInput').value = smsContent;
+            const resultBox = document.getElementById('resultBox');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultDesc = document.getElementById('resultDesc');
+
+            resultBox.style.display = 'block';
+            let isDanger = smsContent.toLowerCase().includes("otp") || smsContent.toLowerCase().includes("reward") || smsContent.toLowerCase().includes("courier") || smsContent.toLowerCase().includes("blocked");
+            
+            if(isDanger) {
+                resultBox.className = "result-box danger";
+                resultTitle.innerText = "⚠️ High Risk: Smishing (SMS Phishing) Detected!";
+                resultDesc.innerText = "Text contains classic smishing lures prompting unauthorized credential leaks or OTP theft.";
+            } else {
+                resultBox.className = "result-box safe";
+                resultTitle.innerText = "✅ Safe Message Verified";
+                resultDesc.innerText = "No deceptive carrier alerts, malicious gateway tracking, or fraudulent text vectors found.";
+            }
+
+            const now = new Date();
+            const historyItem = {
+                type: 'sms',
+                content: smsContent,
+                status: isDanger ? 'danger' : 'safe',
+                statusText: isDanger ? 'SMISHING ALERT' : 'SAFE SMS',
+                dateStr: now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+                timeStr: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+            };
+
+            let history = JSON.parse(localStorage.getItem('scanHistory')) || [];
+            history.unshift(historyItem);
+            localStorage.setItem('scanHistory', JSON.stringify(history));
+        }
+
+        function scanSms() {
+            const input = document.getElementById('smsInput').value.trim();
+            if(!input) {
+                alert("Please enter SMS content first!");
+                return;
+            }
+            executeSmsScan(input);
+        }
+
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const scanTarget = urlParams.get('scan');
+            if (scanTarget) executeSmsScan(scanTarget);
+        }
+    </script>
+</body>
+</html>

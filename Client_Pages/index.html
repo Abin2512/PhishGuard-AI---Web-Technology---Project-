@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Phishing Link Detector - Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <script>
+        if (localStorage.getItem('theme') === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+        }
+    </script>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="logo-area">
+            <h2>🛡️ PhishGuard AI</h2>
+            <ul class="nav-links">
+                <li class="active"><a href="index.html">🔗 Link Scanner</a></li>
+                <li><a href="email.html">📧 Phishing Email</a></li>
+                <li><a href="sms.html">💬 Phishing SMS</a></li>
+                <li><a href="history.html">📊 History</a></li>
+                <li><a href="settings.html">⚙️ Settings</a></li>
+            </ul>
+        </div>
+        <ul class="sidebar-bottom">
+            <li><a href="About Us.html">ℹ️ About Us</a></li>
+            <li><a href="rating.html">⭐ Rate Us</a></li>
+            <li><a href="account.html">👤 Account / Setup</a></li>
+        </ul>
+    </aside>
+
+    <main class="main-content">
+        <div class="header">
+            <h1>Link Security Scanner</h1>
+            <p>Paste any suspicious URL below to examine it instantly via AI model.</p>
+        </div>
+
+        <div class="scanner-container">
+            <div class="input-group">
+                <input type="text" id="urlInput" placeholder="Enter URL to check (e.g., https://example.com)...">
+                <button onclick="scanLink()">Examine Link</button>
+            </div>
+
+            <div id="resultBox" class="result-box">
+                <h4 id="resultTitle" style="margin-bottom: 5px;">Analysis Result</h4>
+                <p id="resultDesc">Details will appear here...</p>
+            </div>
+        </div>
+
+        <div class="history-section">
+            <div class="history-section-header">
+                <h3>Recent Scans</h3>
+                <a href="history.html" class="see-more-btn">See More &gt;</a>
+            </div>
+            <div class="history-list" id="recentHistoryContainer"></div>
+        </div>
+    </main>
+
+    <script>
+        function loadRecentHistory() {
+            const container = document.getElementById('recentHistoryContainer');
+            let history = JSON.parse(localStorage.getItem('scanHistory')) || [];
+
+            if (history.length === 0) {
+                container.innerHTML = `<p style="color: var(--text-muted); font-size: 0.9rem;">No recent scans yet.</p>`;
+                return;
+            }
+
+            container.innerHTML = '';
+            history.slice(0, 3).forEach(item => {
+                const div = document.createElement('div');
+                div.className = `history-item ${item.status}`;
+                div.onclick = () => {
+                    if(item.type === 'email') window.location.href = `email.html?scan=${encodeURIComponent(item.content)}`;
+                    else if(item.type === 'sms') window.location.href = `sms.html?scan=${encodeURIComponent(item.content)}`;
+                    else window.location.href = `index.html?scan=${encodeURIComponent(item.content)}`;
+                };
+                div.innerHTML = `
+                    <div>
+                        <span style="font-size: 0.75rem; color: var(--${item.status === 'safe' ? 'safe-color' : 'danger-color'}); font-weight: bold; display: block; margin-bottom: 2px;">[LINK] ${item.statusText}</span>
+                        <span class="link-text" style="font-size: 0.95rem;">${item.content}</span>
+                    </div>
+                    <div class="timestamp">${item.dateStr} • ${item.timeStr}</div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function executeScan(urlToScan) {
+            document.getElementById('urlInput').value = urlToScan;
+            const resultBox = document.getElementById('resultBox');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultDesc = document.getElementById('resultDesc');
+
+            resultBox.style.display = 'block';
+            let isDanger = urlToScan.includes("login") || urlToScan.includes("free") || urlToScan.includes("xyz") || urlToScan.includes("verify");
+            
+            if(isDanger) {
+                resultBox.className = "result-box danger";
+                resultTitle.innerText = "⚠️ High Risk: Phishing Link Detected!";
+                resultDesc.innerText = "This URL mimics known trusted patterns and redirects to a fraudulent server.";
+            } else {
+                resultBox.className = "result-box safe";
+                resultTitle.innerText = "✅ Safe Link Verified";
+                resultDesc.innerText = "No malicious signatures, structural threats, or suspicious redirects found.";
+            }
+
+            const now = new Date();
+            const historyItem = {
+                type: 'link',
+                content: urlToScan,
+                status: isDanger ? 'danger' : 'safe',
+                statusText: isDanger ? 'PHISHING WARNING' : 'SAFE',
+                dateStr: now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+                timeStr: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+            };
+
+            let history = JSON.parse(localStorage.getItem('scanHistory')) || [];
+            history.unshift(historyItem);
+            localStorage.setItem('scanHistory', JSON.stringify(history));
+            loadRecentHistory();
+        }
+
+        function scanLink() {
+            const input = document.getElementById('urlInput').value.trim();
+            if(!input) {
+                alert("Please enter a link first!");
+                return;
+            }
+            executeScan(input);
+        }
+
+        window.onload = function() {
+            loadRecentHistory();
+            const urlParams = new URLSearchParams(window.location.search);
+            const scanTarget = urlParams.get('scan');
+            if (scanTarget) executeScan(scanTarget);
+        }
+    </script>
+</body>
+</html>

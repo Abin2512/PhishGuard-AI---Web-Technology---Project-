@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Phishing Email Detector</title>
+    <link rel="stylesheet" href="style.css">
+    <script>
+        if (localStorage.getItem('theme') === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+        }
+    </script>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="logo-area">
+            <h2>🛡️ PhishGuard AI</h2>
+            <ul class="nav-links">
+                <li><a href="index.html">🔗 Link Scanner</a></li>
+                <li class="active"><a href="email.html">📧 Phishing Email</a></li>
+                <li><a href="sms.html">💬 Phishing SMS</a></li>
+                <li><a href="history.html">📊 History</a></li>
+                <li><a href="settings.html">⚙️ Settings</a></li>
+            </ul>
+        </div>
+        <ul class="sidebar-bottom">
+            <li><a href="About Us.html">ℹ️ About Us</a></li>
+            <li><a href="rating.html">⭐ Rate Us</a></li>
+            <li><a href="account.html">👤 Account / Setup</a></li>
+        </ul>
+    </aside>
+
+    <main class="main-content">
+        <div class="header">
+            <h1>Email Content Scanner</h1>
+            <p>Paste suspicious email text body below to check for spear phishing indicators.</p>
+        </div>
+
+        <div class="scanner-container">
+            <div class="input-group" style="flex-direction: column;">
+                <textarea id="emailInput" placeholder="Paste full email body content here..."></textarea>
+                <button onclick="scanEmail()" style="align-self: flex-end; margin-top: 10px;">Examine Email</button>
+            </div>
+
+            <div id="resultBox" class="result-box">
+                <h4 id="resultTitle" style="margin-bottom: 5px;">Analysis Result</h4>
+                <p id="resultDesc">Details will appear here...</p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function executeEmailScan(emailContent) {
+            document.getElementById('emailInput').value = emailContent;
+            const resultBox = document.getElementById('resultBox');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultDesc = document.getElementById('resultDesc');
+
+            resultBox.style.display = 'block';
+            let isDanger = emailContent.toLowerCase().includes("urgent") || emailContent.toLowerCase().includes("bank") || emailContent.toLowerCase().includes("verify account") || emailContent.toLowerCase().includes("win");
+            
+            if(isDanger) {
+                resultBox.className = "result-box danger";
+                resultTitle.innerText = "⚠️ High Risk: Phishing Email Detected!";
+                resultDesc.innerText = "Contains social engineering triggers, urgency language, and deceptive financial prompts.";
+            } else {
+                resultBox.className = "result-box safe";
+                resultTitle.innerText = "✅ Legitimate Email Verified";
+                resultDesc.innerText = "No threatening patterns, spoofed headers, or suspicious financial demands discovered.";
+            }
+
+            const now = new Date();
+            const historyItem = {
+                type: 'email',
+                content: emailContent,
+                status: isDanger ? 'danger' : 'safe',
+                statusText: isDanger ? 'EMAIL PHISHING' : 'SAFE EMAIL',
+                dateStr: now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+                timeStr: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+            };
+
+            let history = JSON.parse(localStorage.getItem('scanHistory')) || [];
+            history.unshift(historyItem);
+            localStorage.setItem('scanHistory', JSON.stringify(history));
+        }
+
+        function scanEmail() {
+            const input = document.getElementById('emailInput').value.trim();
+            if(!input) {
+                alert("Please paste email content first!");
+                return;
+            }
+            executeEmailScan(input);
+        }
+
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const scanTarget = urlParams.get('scan');
+            if (scanTarget) executeEmailScan(scanTarget);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Phishing Detector - Account Setup</title>
+    <link rel="stylesheet" href="style.css">
+    <script>
+        if (localStorage.getItem('theme') === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light');
+        }
+    </script>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <div class="logo-area">
+            <h2>🛡️ PhishGuard AI</h2>
+            <ul class="nav-links">
+                <li><a href="index.html">🔗 Link Scanner</a></li>
+                <li><a href="email.html">📧 Phishing Email</a></li>
+                <li><a href="sms.html">💬 Phishing SMS</a></li>
+                <li><a href="history.html">📊 History</a></li>
+                <li><a href="settings.html">⚙️ Settings</a></li>
+            </ul>
+        </div>
+        <ul class="sidebar-bottom">
+            <li><a href="About Us.html">ℹ️ About Us</a></li>
+            <li><a href="rating.html">⭐ Rate Us</a></li>
+            <li class="active"><a href="account.html">👤 Account / Setup</a></li>
+        </ul>
+    </aside>
+
+    <main class="main-content">
+        <div class="header">
+            <h1>Account Authentication</h1>
+            <p>Sign in or create your profile to sync feedback and history preferences.</p>
+        </div>
+
+        <div class="form-card">
+            <form onsubmit="handleAccountSubmit(event)">
+                
+                <!-- Error Message Box -->
+                <div id="errorBox" style="display: none; background: rgba(239, 68, 68, 0.1); border-left: 4px solid var(--danger-color); color: var(--danger-color); padding: 12px; border-radius: 6px; margin-bottom: 15px; font-weight: 500; font-size: 0.9rem;">
+                </div>
+
+                <div class="form-group">
+                    <label for="userIdentifier">Email Address or Phone Number</label>
+                    <input type="text" id="userIdentifier" placeholder="e.g., student@marwadi.edu or 9876543210" required>
+                </div>
+                <div class="form-group">
+                    <label for="profileName">Display Username</label>
+                    <input type="text" id="profileName" placeholder="e.g., Abin Samuel" required>
+                </div>
+                <button type="submit" class="form-btn">Continue / Login</button>
+            </form>
+
+            <div class="divider">OR CONNECT WITH</div>
+
+            <button class="social-btn" onclick="socialLogin('Google')">🌐 Continue with Google Account</button>
+            <button class="social-btn" onclick="socialLogin('Apple')"> Continue with Apple Account</button>
+
+            <div style="margin-top: 20px; text-align: center;">
+                <a href="index.html" style="color: var(--text-muted); font-size: 0.9rem; text-decoration: none;">Skip Account Creation &gt;&gt;</a>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        window.onload = function() {
+            const savedName = localStorage.getItem('accountName');
+            const savedId = localStorage.getItem('accountIdentifier');
+            if (savedName) document.getElementById('profileName').value = savedName;
+            if (savedId) document.getElementById('userIdentifier').value = savedId;
+        }
+
+        function handleAccountSubmit(e) {
+            e.preventDefault();
+            
+            const identifier = document.getElementById('userIdentifier').value.trim();
+            const profileName = document.getElementById('profileName').value.trim();
+            const errorBox = document.getElementById('errorBox');
+            
+            // Reset error box at every new submit attempt
+            errorBox.style.display = 'none';
+            errorBox.innerText = '';
+            
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const phonePattern = /^\d{10}$/; 
+            
+            if (!emailPattern.test(identifier) && !phonePattern.test(identifier)) {
+                errorBox.innerText = "⚠️ Please enter a valid Email address or a 10-digit Phone number.";
+                errorBox.style.display = 'block';
+                return; // Stop execution here if error
+            }
+            
+            if (profileName === "") {
+                errorBox.innerText = "⚠️ Display username cannot be empty.";
+                errorBox.style.display = 'block';
+                return;
+            }
+
+            // Success Execution
+            localStorage.setItem('accountIdentifier', identifier);
+            localStorage.setItem('accountName', profileName);
+            alert("Account configured successfully!");
+            window.location.href = "index.html";
+        }
+
+        function socialLogin(provider) {
+            localStorage.setItem('accountName', provider === 'Google' ? 'Google User' : 'Apple User');
+            localStorage.setItem('accountIdentifier', `auth@${provider.toLowerCase()}.com`);
+            alert(`Authenticated via ${provider}! Redirecting.`);
+            window.location.href = "index.html";
+        }
+    </script>
+</body>
+</html>
