@@ -54,7 +54,7 @@
                 </div>
                 
                 <!-- Admin Login Button -->
-                <button type="button" class="social-btn" style="background-color: #28a745; border: none; border-radius: 6px; color: white;" onclick="window.location.href='../Admin_Pages/admin-login.html'">Admin Login</button>
+                <button type="button" class="social-btn" style="background-color: #28a745; border: none; border-radius: 6px; color: white; margin-bottom: 12px; cursor: pointer;" onclick="window.location.href='https://abin2512.github.io/PhishGuard-AI---Web-Technology---Project---Admin---Pages-/'">Admin Login</button>
                 
                 <button type="submit" class="form-btn">Continue / Login</button>
             </form>
@@ -95,13 +95,15 @@
             if (!identifier) {
                 errors.push("⚠️ Email or Phone Number is required.");
             } else {
-                // Check if it contains only numbers (Phone number check)
-                const isNumeric = /^\d+$/.test(identifier);
+                // Remove optional +91 or 0 prefix for checking digits
+                const cleanedIdentifier = identifier.replace(/^(\+91|0)\s?/, '');
+                
+                const isNumeric = /^\d+$/.test(cleanedIdentifier);
                 
                 if (isNumeric) {
-                    if (identifier.length !== 10) {
+                    if (cleanedIdentifier.length !== 10) {
                         errors.push("⚠️ Phone number must be exactly 10 digits.");
-                    } else if (!/^[6-9]\d{9}$/.test(identifier)) {
+                    } else if (!/^[6-9]\d{9}$/.test(cleanedIdentifier)) {
                         errors.push("⚠️ Enter a valid Indian mobile number (Starting with 6-9).");
                     }
                 } else {
@@ -124,10 +126,10 @@
                     errors.push("⚠️ Username cannot exceed 30 characters.");
                 }
                 
-                // Only alphabets and spaces allowed
-                const namePattern = /^[a-zA-Z\s]+$/;
+                // Allow alphabets, spaces, and periods (e.g., Abin S.)
+                const namePattern = /^[a-zA-Z\s.]+$/;
                 if (!namePattern.test(profileName)) {
-                    errors.push("⚠️ Username can only contain alphabets (No numbers or special characters).");
+                    errors.push("⚠️ Username can only contain alphabets and periods (No numbers or special characters).");
                 }
                 
                 // Check for multiple consecutive spaces
@@ -138,10 +140,9 @@
 
             // --- 3. Show Errors if any ---
             if (errors.length > 0) {
-                // Display all errors separated by line breaks
                 errorBox.innerHTML = errors.join('<br>');
                 errorBox.style.display = 'block';
-                return; // Stop execution here
+                return; 
             }
 
             // --- Success Execution ---
