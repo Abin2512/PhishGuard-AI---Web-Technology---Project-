@@ -38,22 +38,24 @@
         </div>
 
         <div class="form-card">
-            <form onsubmit="handleAccountSubmit(event)">
+            <form id="accountForm" onsubmit="handleAccountSubmit(event)" novalidate>
                 
                 <!-- Error Message Box -->
-                <div id="errorBox" style="display: none; background: rgba(239, 68, 68, 0.1); border-left: 4px solid var(--danger-color); color: var(--danger-color); padding: 12px; border-radius: 6px; margin-bottom: 15px; font-weight: 500; font-size: 0.9rem;">
+                <div id="errorBox" style="display: none; background: rgba(239, 68, 68, 0.1); border-left: 4px solid var(--danger-color); color: var(--danger-color); padding: 12px; border-radius: 6px; margin-bottom: 15px; font-weight: 500; font-size: 0.9rem; line-height: 1.5;">
                 </div>
 
                 <div class="form-group">
                     <label for="userIdentifier">Email Address or Phone Number</label>
-                    <input type="text" id="userIdentifier" placeholder="e.g., student@marwadi.edu or 9876543210" required>
+                    <input type="text" id="userIdentifier" placeholder="e.g., student@marwadi.edu or 9876543210" maxlength="50" required>
                 </div>
                 <div class="form-group">
                     <label for="profileName">Display Username</label>
-                    <input type="text" id="profileName" placeholder="e.g., Abin Samuel" required>
+                    <input type="text" id="profileName" placeholder="e.g., Abin Samuel" maxlength="30" required>
                 </div>
-                <!-- Admin Login Button Updated Here with type="button" and correct relative path -->
-                <button type="button" class="social-btn" style="background-color: #28a745; border: none; border-radius: 6px;"><a href="../Admin_Pages/admin-login.html" style="color: white; text-decoration: none; display: block; width: 100%;">Admin Login</a></button>
+                
+                <!-- Admin Login Button -->
+                <button type="button" class="social-btn" style="background-color: #28a745; border: none; border-radius: 6px; color: white;" onclick="window.location.href='../Admin_Pages/admin-login.html'">Admin Login</button>
+                
                 <button type="submit" class="form-btn">Continue / Login</button>
             </form>
 
@@ -83,26 +85,66 @@
             const profileName = document.getElementById('profileName').value.trim();
             const errorBox = document.getElementById('errorBox');
             
-            // Reset error box at every new submit attempt
+            // Reset error box
             errorBox.style.display = 'none';
-            errorBox.innerText = '';
+            errorBox.innerHTML = '';
             
-            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            const phonePattern = /^\d{10}$/; 
-            
-            if (!emailPattern.test(identifier) && !phonePattern.test(identifier)) {
-                errorBox.innerText = "⚠️ Please enter a valid Email address or a 10-digit Phone number.";
-                errorBox.style.display = 'block';
-                return; // Stop execution here if error
-            }
-            
-            if (profileName === "") {
-                errorBox.innerText = "⚠️ Display username cannot be empty.";
-                errorBox.style.display = 'block';
-                return;
+            let errors = [];
+
+            // --- 1. Identifier (Email / Phone) Validation ---
+            if (!identifier) {
+                errors.push("⚠️ Email or Phone Number is required.");
+            } else {
+                // Check if it contains only numbers (Phone number check)
+                const isNumeric = /^\d+$/.test(identifier);
+                
+                if (isNumeric) {
+                    if (identifier.length !== 10) {
+                        errors.push("⚠️ Phone number must be exactly 10 digits.");
+                    } else if (!/^[6-9]\d{9}$/.test(identifier)) {
+                        errors.push("⚠️ Enter a valid Indian mobile number (Starting with 6-9).");
+                    }
+                } else {
+                    // Strict Email Validation
+                    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                    if (!emailPattern.test(identifier)) {
+                        errors.push("⚠️ Please enter a valid Email address.");
+                    }
+                }
             }
 
-            // Success Execution
+            // --- 2. Profile Name Validation ---
+            if (!profileName) {
+                errors.push("⚠️ Display username cannot be empty.");
+            } else {
+                if (profileName.length < 3) {
+                    errors.push("⚠️ Username must be at least 3 characters long.");
+                }
+                if (profileName.length > 30) {
+                    errors.push("⚠️ Username cannot exceed 30 characters.");
+                }
+                
+                // Only alphabets and spaces allowed
+                const namePattern = /^[a-zA-Z\s]+$/;
+                if (!namePattern.test(profileName)) {
+                    errors.push("⚠️ Username can only contain alphabets (No numbers or special characters).");
+                }
+                
+                // Check for multiple consecutive spaces
+                if (/\s{2,}/.test(profileName)) {
+                    errors.push("⚠️ Username cannot contain multiple spaces together.");
+                }
+            }
+
+            // --- 3. Show Errors if any ---
+            if (errors.length > 0) {
+                // Display all errors separated by line breaks
+                errorBox.innerHTML = errors.join('<br>');
+                errorBox.style.display = 'block';
+                return; // Stop execution here
+            }
+
+            // --- Success Execution ---
             localStorage.setItem('accountIdentifier', identifier);
             localStorage.setItem('accountName', profileName);
             alert("Account configured successfully!");
